@@ -1,0 +1,1 @@
+Aquí va la lógica de negocio (ej. Regla de solapamiento y cupos)
