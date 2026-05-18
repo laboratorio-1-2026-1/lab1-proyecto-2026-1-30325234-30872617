@@ -37,6 +37,29 @@ router.get('/', verifyToken, authorize([1]), maquinaController.getMaquinas);
  *         description: Ticket creado
  */
 router.post('/:id_maquina/tickets', verifyToken, authorize([1]), maquinaController.createTicket);
+
+/**
+ * @swagger
+ * /maquinas/{id_maquina}/tickets:
+ *   get:
+ *     summary: Obtener el historial de tickets de mantenimiento de una máquina
+ *     tags: [Máquinas]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id_maquina
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Tickets de mantenimiento de la máquina
+ *       404:
+ *         description: Máquina no encontrada
+ */
+router.get('/:id_maquina/tickets', verifyToken, authorize([1]), maquinaController.getTicketsByMaquina);
+
 /**
  * @swagger
  * /maquinas/{id_maquina}/estado:

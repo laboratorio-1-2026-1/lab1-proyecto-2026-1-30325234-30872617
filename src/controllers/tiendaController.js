@@ -90,8 +90,6 @@ const createProducto = async (req, res) => {
         });
     }
 };
-    }
-};
 
 const createVenta = async (req, res) => {
     const client = await pool.connect();

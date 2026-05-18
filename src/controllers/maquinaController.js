@@ -52,6 +52,31 @@ const createTicket = async (req, res) => {
     }
 };
 
+const getTicketsByMaquina = async (req, res) => {
+    try {
+        const { id_maquina } = req.params;
+        const maquina = await mantenimientoRepository.findMaquinaById(id_maquina);
+        if (!maquina) {
+            return res.status(404).json({
+                error: 'Not Found',
+                codigoInterno: 'ERR_MAQUINA_NO_ENCONTRADA',
+                mensaje: 'No se encontró la máquina especificada',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        const tickets = await mantenimientoRepository.getTicketsByMaquina(id_maquina);
+        return res.status(200).json(tickets);
+    } catch (error) {
+        console.error('Error en maquinaController.getTicketsByMaquina:', error.message);
+        return res.status(500).json({
+            error: 'Internal Server Error',
+            mensaje: 'Error al obtener el historial de tickets para la máquina',
+            timestamp: new Date().toISOString()
+        });
+    }
+};
+
 const updateEstado = async (req, res) => {
     try {
         const { id_maquina } = req.params;
@@ -88,4 +113,4 @@ const updateEstado = async (req, res) => {
     }
 };
 
-module.exports = { getMaquinas, createTicket, updateEstado };
+module.exports = { getMaquinas, createTicket, getTicketsByMaquina, updateEstado };
