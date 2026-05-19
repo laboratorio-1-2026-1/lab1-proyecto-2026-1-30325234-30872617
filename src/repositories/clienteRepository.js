@@ -32,4 +32,15 @@ const findByUserId = async (id_user) => {
     }
 };
 
-module.exports = { findById, findByUserId };
+const findByDocumento = async (documento) => {
+    try {
+        const query = 'SELECT c.* FROM Clientes c JOIN Usuario u ON c.ID_user = u.ID_user WHERE u.Cedula = $1';
+        const { rows } = await pool.query(query, [documento]);
+        return rows[0] || null;
+    } catch (error) {
+        console.error('Error in clienteRepository.findByDocumento:', error.message);
+        throw new Error('Error al consultar el cliente');
+    }
+};
+
+module.exports = { findById, findByUserId, findByDocumento };
