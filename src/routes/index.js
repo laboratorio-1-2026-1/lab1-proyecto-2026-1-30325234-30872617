@@ -1,17 +1,26 @@
 const express = require('express');
 const router = express.Router();
 
-// Importar los archivos de rutas de cada módulo
-const authRoutes = require('./authRoutes');      
-const maquinaRoutes = require('./maquinaRoutes'); 
-const disciplinaRoutes = require('./disciplinaRoutes'); // Nueva importación
+const authRoutes = require('./authRoutes');
+const maquinaRoutes = require('./maquinaRoutes');
+const disciplinaRoutes = require('./disciplinaRoutes');
+const accesoRoutes = require('./accesoRoutes');
+const sesionRoutes = require('./sesionRoutes');
+const reservaRoutes = require('./reservaRoutes');
+const clienteRoutes = require('./clienteRoutes');
+const membresiaRoutes = require('./membresiaRoutes');
+const ticketRoutes = require('./ticketRoutes');
+const tiendaRoutes = require('./tiendaRoutes');
 
-// Conectar los módulos a sus prefijos correspondientes
-// Las rutas de auth ahora empezarán con /api/v1/auth [3]
-router.use('/auth', authRoutes);       
-// Las rutas de máquinas ahora empezarán con /api/v1/maquinas [3]
-router.use('/maquinas', maquinaRoutes); 
-router.use('/disciplinas', disciplinaRoutes); // Nuevo prefijo
-
+router.use('/auth', authRoutes);
+router.use('/maquinas', maquinaRoutes);
+router.use('/disciplinas', disciplinaRoutes);
+router.use('/accesos', accesoRoutes);
+router.use('/sesiones', sesionRoutes);
+router.use('/reservas', reservaRoutes);
+router.use('/clientes', clienteRoutes);
+router.use('/', membresiaRoutes);
+router.use('/tickets', ticketRoutes);
+router.use('/', tiendaRoutes);
 
 module.exports = router;

@@ -1,9 +1,36 @@
 require('dotenv').config(); // Esto debe ser la línea 1
 const express = require('express');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 const mainRouter = require('./routes/index'); // Asegúrate de que esta ruta sea correcta [11]
 
 const app = express();
 app.use(express.json());
+
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'SmartGym API',
+            version: '1.0.0',
+            description: 'Documentación técnica interactiva para la gestión de SmartGym [1]',
+        },
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
+        security: [{ bearerAuth: [] }], // Aplica seguridad global para las pruebas
+    },
+    apis: ['./src/routes/*.js'], // Indica dónde están tus comentarios de documentación
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Prefijo oficial de la API v1 [11, 12]
 app.use('/api/v1', mainRouter);
