@@ -57,7 +57,7 @@ const insertControlBitacora = async (id_client, acceso, motivo_rechazo) => {
 };
 
 module.exports = {
-    findClientByTelefono,
+    findClientByIdClient,
     findActiveMembershipWithPayment,
     insertControlBitacora
 };

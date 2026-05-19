@@ -63,9 +63,34 @@ const listTicketsHistory = async () => {
     }
 };
 
+const getTicketsByMaquina = async (id_maquina) => {
+    try {
+        const query = `
+            SELECT
+                t.id_ticket,
+                t.id_maquina,
+                m.nombre AS maquina,
+                t.fecha_falla AS fecha,
+                t.estado,
+                t.descripcion AS observaciones,
+                t.fecha_resolucion,
+                t.costo_reparacion
+            FROM ticketsmantenimiento t
+            JOIN maquinas m ON m.id_maquina = t.id_maquina
+            WHERE t.id_maquina = $1
+            ORDER BY t.fecha_falla DESC`;
+        const result = await pool.query(query, [id_maquina]);
+        return result.rows;
+    } catch (error) {
+        console.error('Error en mantenimientoRepository.getTicketsByMaquina:', error.message);
+        throw error;
+    }
+};
+
 module.exports = {
     findMaquinaById,
     createTicket,
     updateMachineEstado,
-    listTicketsHistory
+    listTicketsHistory,
+    getTicketsByMaquina
 };

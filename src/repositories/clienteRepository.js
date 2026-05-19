@@ -11,6 +11,17 @@ const findClientById = async (id_client) => {
     }
 };
 
+const listClientes = async () => {
+    try {
+        const query = 'SELECT id_client, id_user, nombre, apellido, telefono FROM clientes ORDER BY id_client';
+        const result = await pool.query(query);
+        return result.rows;
+    } catch (error) {
+        console.error('Error en clienteRepository.listClientes:', error.message);
+        throw error;
+    }
+};
+
 const findClientByUserId = async (id_user) => {
     try {
         const query = 'SELECT id_client, id_user, nombre, apellido, telefono FROM clientes WHERE id_user = $1';
@@ -73,6 +84,7 @@ const createEvaluacion = async (id_client, id_entrenador, estatura, porcentaje_g
 
 module.exports = {
     findClientById,
+    listClientes,
     findClientByUserId,
     findEntrenadorByUserId,
     findEvaluacionesByClient,

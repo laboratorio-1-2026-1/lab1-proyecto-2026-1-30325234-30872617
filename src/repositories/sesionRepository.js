@@ -85,6 +85,47 @@ const listSesiones = async () => {
     }
 };
 
+const listSesionesWithFilters = async (fecha, disciplina) => {
+    try {
+        let query = `
+            SELECT
+                s.id_sesion,
+                d.nombre AS disciplina,
+                d.id_disciplina,
+                CONCAT(e.nombre, ' ', e.apellido) AS entrenador,
+                s.hora_inicio,
+                s.hora_fin,
+                s.cupos
+            FROM sesiones s
+            JOIN disciplina d ON d.id_disciplina = s.id_disciplina
+            JOIN entrenadores e ON e.id_entrenador = s.id_entrenador
+            WHERE 1=1`;
+        const params = [];
+        let paramCount = 1;
+        
+        if (fecha) {
+            query += ` AND s.id_sesion IN (
+                SELECT DISTINCT r.id_sesion FROM reservas r WHERE r.fecha = $${paramCount}
+            )`;
+            params.push(fecha);
+            paramCount++;
+        }
+        
+        if (disciplina) {
+            query += ` AND d.nombre = $${paramCount}`;
+            params.push(disciplina);
+            paramCount++;
+        }
+        
+        query += ` ORDER BY s.id_sesion`;
+        const result = await pool.query(query, params);
+        return result.rows;
+    } catch (error) {
+        console.error('Error en sesionRepository.listSesionesWithFilters:', error.message);
+        throw error;
+    }
+};
+
 const getSessionReservations = async (id_sesion) => {
     try {
         const query = `
@@ -167,6 +208,7 @@ module.exports = {
     findOverlappingSessionForEntrenador,
     createSesion,
     listSesiones,
+    listSesionesWithFilters,
     getSessionReservations,
     countReservasBySessionDate,
     findReservaByClientSessionDate,

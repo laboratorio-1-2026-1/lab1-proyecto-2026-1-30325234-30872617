@@ -23,7 +23,19 @@ const swaggerOptions = {
                     bearerFormat: 'JWT',
                 },
             },
+            schemas: {
+                Error: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' },
+                        codigoInterno: { type: 'string' },
+                        mensaje: { type: 'string' },
+                        timestamp: { type: 'string', format: 'date-time' },
+                    },
+                },
+            },
         },
+        servers: [{ url: 'http://localhost:3000/api/v1' }],
         security: [{ bearerAuth: [] }], // Aplica seguridad global para las pruebas
     },
     apis: ['./src/routes/*.js'], // Indica dónde están tus comentarios de documentación

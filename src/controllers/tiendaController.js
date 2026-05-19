@@ -51,6 +51,48 @@ const updateProductoStock = async (req, res) => {
     }
 };
 
+const createProducto = async (req, res) => {
+    try {
+        const { nombre, descripcion, precio, stock } = req.body;
+
+        if (!nombre || precio == null) {
+            return res.status(400).json({
+                error: 'Bad Request',
+                mensaje: 'Se requieren nombre y precio para crear un producto',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        if (precio < 0) {
+            return res.status(400).json({
+                error: 'Bad Request',
+                mensaje: 'El precio debe ser mayor o igual a cero',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        if (stock == null || stock < 0) {
+            return res.status(400).json({
+                error: 'Bad Request',
+                mensaje: 'El stock debe ser un valor entero mayor o igual a cero',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        const producto = await tiendaRepository.createProducto(nombre, descripcion || null, precio, stock);
+        return res.status(201).json(producto);
+    } catch (error) {
+        console.error('Error en tiendaController.createProducto:', error.message);
+        return res.status(500).json({
+            error: 'Internal Server Error',
+            mensaje: 'Error al crear el producto',
+            timestamp: new Date().toISOString()
+        });
+    }
+};
+    }
+};
+
 const createVenta = async (req, res) => {
     const client = await pool.connect();
     try {
@@ -192,6 +234,7 @@ const getVentas = async (req, res) => {
 module.exports = {
     getProductos,
     updateProductoStock,
+    createProducto,
     createVenta,
     getVentas
 };

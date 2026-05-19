@@ -2,7 +2,27 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
 
-// Definimos el endpoint oficial: POST /api/v1/auth/login [1]
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Iniciar sesión y obtener token JWT
+ *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Token de acceso JWT generado
+ */
 router.post('/login', authController.login);
 
 module.exports = router;

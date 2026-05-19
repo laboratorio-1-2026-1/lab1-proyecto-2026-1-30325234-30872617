@@ -48,6 +48,20 @@ const updateProductoStock = async (id_producto, stock) => {
     }
 };
 
+const createProducto = async (nombre, descripcion, precio, stock) => {
+    try {
+        const query = `
+            INSERT INTO productostienda (nombre, descripcion, precio, stock)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *`;
+        const result = await pool.query(query, [nombre, descripcion, precio, stock]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error en tiendaRepository.createProducto:', error.message);
+        throw error;
+    }
+};
+
 const getNextDetalleVentaId = async (client) => {
     try {
         const query = 'SELECT COALESCE(MAX(id_detalle), 0) + 1 AS next_id FROM detalleventa';
@@ -134,6 +148,7 @@ module.exports = {
     listProductos,
     findProductoById,
     updateProductoStock,
+    createProducto,
     getNextDetalleVentaId,
     insertVenta,
     insertDetalleVenta,

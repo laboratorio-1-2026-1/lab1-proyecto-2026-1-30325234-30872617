@@ -1,6 +1,20 @@
 const clienteRepository = require('../repositories/clienteRepository');
 const membresiaRepository = require('../repositories/membresiaRepository');
 
+const getClientes = async (req, res) => {
+    try {
+        const clientes = await clienteRepository.listClientes();
+        return res.status(200).json(clientes);
+    } catch (error) {
+        console.error('Error en clienteController.getClientes:', error.message);
+        return res.status(500).json({
+            error: 'Internal Server Error',
+            mensaje: 'Error al obtener la lista de clientes',
+            timestamp: new Date().toISOString()
+        });
+    }
+};
+
 const createEvaluacion = async (req, res) => {
     try {
         const { id_cliente } = req.params;
@@ -115,6 +129,7 @@ const getMembresias = async (req, res) => {
 };
 
 module.exports = {
+    getClientes,
     createEvaluacion,
     getEvaluaciones,
     getMembresias

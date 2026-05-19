@@ -74,7 +74,14 @@ const createSesion = async (req, res) => {
 
 const getSesiones = async (req, res) => {
     try {
-        const sesiones = await sesionRepository.listSesiones();
+        const { fecha, disciplina } = req.query;
+        let sesiones;
+        
+        if (fecha || disciplina) {
+            sesiones = await sesionRepository.listSesionesWithFilters(fecha, disciplina);
+        } else {
+            sesiones = await sesionRepository.listSesiones();
+        }
         return res.status(200).json(sesiones);
     } catch (error) {
         console.error('Error en sesionController.getSesiones:', error.message);

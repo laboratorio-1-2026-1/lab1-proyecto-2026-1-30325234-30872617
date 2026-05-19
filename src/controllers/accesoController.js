@@ -2,17 +2,19 @@ const accesoRepository = require('../repositories/accesoRepository');
 
 const registrarEntrada = async (req, res) => {
     try {
-        const { cedula } = req.body;
+        const { documentoIdentidad, cedula } = req.body;
+        const rawIdentidad = documentoIdentidad || cedula;
+        const identidad = rawIdentidad ? String(rawIdentidad).replace(/\D/g, '') : '';
 
-        if (!cedula) {
+        if (!identidad) {
             return res.status(400).json({
                 error: 'Bad Request',
-                mensaje: 'Se requiere el número de cédula para registrar el acceso',
+                mensaje: 'Se requiere el número de cédula o documento de identidad para registrar el acceso',
                 timestamp: new Date().toISOString()
             });
         }
 
-        const cliente = await accesoRepository.findClientByIdClient(cedula);
+        const cliente = await accesoRepository.findClientByIdClient(identidad);
 
         if (!cliente) {
             return res.status(404).json({
@@ -29,8 +31,8 @@ const registrarEntrada = async (req, res) => {
             await accesoRepository.insertControlBitacora(cliente.id_client, false, 'Membresía vencida o inactiva');
             return res.status(409).json({
                 error: 'Conflict',
-                codigoInterno: 'ERR_MEMBRESIA_VENCIDA',
-                mensaje: 'El cliente no tiene una membresía activa',
+                codigoInterno: 'ERR_ACCESO_MEMBRESIA_VENCIDA',
+                mensaje: 'El cliente no tiene una membresía activa o la membresía está vencida',
                 timestamp: new Date().toISOString()
             });
         }
@@ -39,7 +41,7 @@ const registrarEntrada = async (req, res) => {
             await accesoRepository.insertControlBitacora(cliente.id_client, false, 'Pagos faltantes');
             return res.status(409).json({
                 error: 'Conflict',
-                codigoInterno: 'ERR_PAGO_INSUFICIENTE',
+                codigoInterno: 'ERR_ACCESO_MEMBRESIA_VENCIDA',
                 mensaje: 'La membresía del cliente no cuenta con pagos vigentes',
                 timestamp: new Date().toISOString()
             });
@@ -47,7 +49,7 @@ const registrarEntrada = async (req, res) => {
 
         await accesoRepository.insertControlBitacora(cliente.id_client, true, null);
 
-        return res.status(200).json({
+        return res.status(201).json({
             message: 'Acceso autorizado',
             cliente: {
                 id_client: cliente.id_client,
