@@ -201,6 +201,23 @@ const createReserva = async (id_client, id_sesion, fecha) => {
     }
 };
 
+const deleteSesion = async (id_sesion) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        await client.query('DELETE FROM reservas WHERE id_sesion = $1', [id_sesion]);
+        const result = await client.query('DELETE FROM sesiones WHERE id_sesion = $1 RETURNING *', [id_sesion]);
+        await client.query('COMMIT');
+        return result.rows[0] || null;
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Error en sesionRepository.deleteSesion:', error.message);
+        throw error;
+    } finally {
+        client.release();
+    }
+};
+
 module.exports = {
     findDisciplinaById,
     findEntrenadorById,
@@ -213,5 +230,6 @@ module.exports = {
     countReservasBySessionDate,
     findReservaByClientSessionDate,
     findClientReservationOverlap,
-    createReserva
+    createReserva,
+    deleteSesion
 };

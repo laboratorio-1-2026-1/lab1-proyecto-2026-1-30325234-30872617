@@ -19,4 +19,18 @@ const findByEmail = async (email) => {
     }
 };
 
-module.exports = { findByEmail };
+const createUser = async (email, password_hash, id_rol) => {
+    try {
+        const query = `
+            INSERT INTO usuario (email, password_hash, id_rol, activo)
+            VALUES ($1, $2, $3, TRUE)
+            RETURNING id_user, email, id_rol`;
+        const result = await pool.query(query, [email, password_hash, id_rol]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error en userRepository.createUser:', error.message);
+        throw error;
+    }
+};
+
+module.exports = { findByEmail, createUser };

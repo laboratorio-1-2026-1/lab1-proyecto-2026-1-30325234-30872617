@@ -29,6 +29,14 @@ router.get('/suscripciones', membresiaController.getSuscripciones);
  *         application/json:
  *           schema:
  *             type: object
+ *             required: ['id_membresia', 'monto', 'metodo_pago']
+ *             properties:
+ *               id_membresia:
+ *                 type: integer
+ *               monto:
+ *                 type: number
+ *               metodo_pago:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Pago registrado

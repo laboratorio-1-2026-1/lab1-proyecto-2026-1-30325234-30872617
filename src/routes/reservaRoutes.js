@@ -17,6 +17,12 @@ const { verifyToken, authorize } = require('../middlewares/authMiddleware');
  *         application/json:
  *           schema:
  *             type: object
+ *             required: ['id_client', 'id_sesion']
+ *             properties:
+ *               id_client:
+ *                 type: integer
+ *               id_sesion:
+ *                 type: integer
  *     responses:
  *       201:
  *         description: Reserva creada

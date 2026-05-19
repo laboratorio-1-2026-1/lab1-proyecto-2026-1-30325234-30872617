@@ -33,6 +33,6 @@ const { verifyToken, authorize } = require('../middlewares/authMiddleware');
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/entrada', verifyToken, authorize([1]), accesoController.registrarEntrada);
+router.post('/entrada', verifyToken, authorize([1,3]), accesoController.registrarEntrada);
 
 module.exports = router;

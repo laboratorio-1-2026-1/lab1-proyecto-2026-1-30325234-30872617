@@ -9,15 +9,11 @@ const { verifyToken, authorize } = require('../middlewares/authMiddleware');
  *   get:
  *     summary: Obtener el listado de máquinas
  *     tags: [Máquinas]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de máquinas obtenida con éxito
- *       403:
- *         description: Permiso insuficiente
  */
-router.get('/', verifyToken, authorize([1]), maquinaController.getMaquinas);
+router.get('/', maquinaController.getMaquinas);
 /**
  * @swagger
  * /maquinas/{id_maquina}/tickets:
@@ -32,6 +28,16 @@ router.get('/', verifyToken, authorize([1]), maquinaController.getMaquinas);
  *         required: true
  *         schema:
  *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: ['descripcion']
+ *             properties:
+ *               descripcion:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Ticket creado

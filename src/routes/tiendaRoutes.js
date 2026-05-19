@@ -93,6 +93,20 @@ router.patch('/productos/:id_producto/stock', verifyToken, authorize([1]), tiend
  *         application/json:
  *           schema:
  *             type: object
+ *             required: ['items']
+ *             properties:
+ *               id_client:
+ *                 type: integer
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   required: ['id_producto', 'cantidad']
+ *                   properties:
+ *                     id_producto:
+ *                       type: integer
+ *                     cantidad:
+ *                       type: integer
  *     responses:
  *       201:
  *         description: Venta registrada

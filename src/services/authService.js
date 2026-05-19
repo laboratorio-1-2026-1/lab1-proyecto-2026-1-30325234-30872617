@@ -27,9 +27,10 @@ const login = async (email, password) => {
     }
 
     // 4. Generación del Token JWT para el Sistema de Identidad [6, 7]
+    const JWT_SECRET = process.env.JWT_SECRET || 'secret_key';
     const token = jwt.sign(
         { id: user.id_user, email: user.email, role: user.id_rol },
-        process.env.JWT_SECRET || 'secret_key',
+        JWT_SECRET,
         { expiresIn: '8h' }
     );
 

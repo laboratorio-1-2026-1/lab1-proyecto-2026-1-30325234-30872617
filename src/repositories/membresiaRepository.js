@@ -115,11 +115,26 @@ const findActiveMembershipWithPayment = async (id_client) => {
     }
 };
 
+const createMembresia = async (id_client, id_suscripcion, fecha_inicio, fecha_fin, estado) => {
+    try {
+        const query = `
+            INSERT INTO membresias (id_client, id_suscripcion, fecha_inicio, fecha_fin, estado)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING *`;
+        const result = await pool.query(query, [id_client, id_suscripcion, fecha_inicio, fecha_fin, estado]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error en membresiaRepository.createMembresia:', error.message);
+        throw error;
+    }
+};
+
 module.exports = {
     listSuscripciones,
     findMembresiaById,
     createPago,
     findPagoById,
     listMembresiasByClient,
-    findActiveMembershipWithPayment
+    findActiveMembershipWithPayment,
+    createMembresia
 };

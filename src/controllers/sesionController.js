@@ -72,6 +72,35 @@ const createSesion = async (req, res) => {
     }
 };
 
+const deleteSesion = async (req, res) => {
+    try {
+        const { id_sesion } = req.params;
+        const sesion = await sesionRepository.findSesionById(id_sesion);
+
+        if (!sesion) {
+            return res.status(404).json({
+                error: 'Not Found',
+                codigoInterno: 'ERR_SESION_NO_ENCONTRADA',
+                mensaje: 'No se encontró la sesión especificada',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        await sesionRepository.deleteSesion(id_sesion);
+        return res.status(200).json({
+            message: 'Sesión eliminada correctamente',
+            id_sesion: Number(id_sesion)
+        });
+    } catch (error) {
+        console.error('Error en sesionController.deleteSesion:', error.message);
+        return res.status(500).json({
+            error: 'Internal Server Error',
+            mensaje: 'Error al eliminar la sesión',
+            timestamp: new Date().toISOString()
+        });
+    }
+};
+
 const getSesiones = async (req, res) => {
     try {
         const { fecha, disciplina } = req.query;
@@ -209,5 +238,6 @@ module.exports = {
     createSesion,
     getSesiones,
     getSesionesReservas,
-    createSesionReserva
+    createSesionReserva,
+    deleteSesion
 };
