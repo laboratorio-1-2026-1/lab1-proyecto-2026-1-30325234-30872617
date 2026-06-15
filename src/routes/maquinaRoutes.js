@@ -9,11 +9,30 @@ const { verifyToken, authorize } = require('../middlewares/authMiddleware');
  *   get:
  *     summary: Obtener el listado de máquinas
  *     tags: [Máquinas]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Elementos por página
  *     responses:
  *       200:
  *         description: Lista de máquinas obtenida con éxito
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginated'
  */
-router.get('/', maquinaController.getMaquinas);
+router.get('/', verifyToken, authorize([1]), maquinaController.getMaquinas);
 /**
  * @swagger
  * /maquinas/{id_maquina}/tickets:
@@ -58,9 +77,25 @@ router.post('/:id_maquina/tickets', verifyToken, authorize([1]), maquinaControll
  *         required: true
  *         schema:
  *           type: integer
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Elementos por página
  *     responses:
  *       200:
  *         description: Tickets de mantenimiento de la máquina
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginated'
  *       404:
  *         description: Máquina no encontrada
  */

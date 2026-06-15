@@ -9,11 +9,56 @@ const { verifyToken, authorize } = require('../middlewares/authMiddleware');
  *   get:
  *     summary: Obtener catálogo público de suscripciones
  *     tags: [Membresías]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Elementos por página
  *     responses:
  *       200:
  *         description: Catálogo de suscripciones
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginated'
  */
 router.get('/suscripciones', membresiaController.getSuscripciones);
+
+/**
+ * @swagger
+ * /suscripciones:
+ *   post:
+ *     summary: Crear una suscripción (Solo Admin)
+ *     tags: [Membresías]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: ['nombre', 'costo', 'duracion']
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               costo:
+ *                 type: number
+ *               duracion:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Suscripción creada
+ */
+router.post('/suscripciones', verifyToken, authorize([1]), membresiaController.createSuscripcion);
 
 /**
  * @swagger
@@ -85,9 +130,26 @@ router.post('/membresias/deactivate-expired', verifyToken, authorize([1]), membr
  *     tags: [Membresías]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Elementos por página
  *     responses:
  *       200:
  *         description: Lista de clientes sin membresía activa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginated'
  */
 router.get('/membresias/clients/no-activos', verifyToken, authorize([1]), membresiaController.listClientsNoActive);
 

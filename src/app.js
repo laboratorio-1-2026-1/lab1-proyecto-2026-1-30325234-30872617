@@ -33,6 +33,18 @@ const swaggerOptions = {
                         timestamp: { type: 'string', format: 'date-time' },
                     },
                 },
+                Paginated: {
+                    type: 'object',
+                    properties: {
+                        items: {
+                            type: 'array',
+                            items: { type: 'object' }
+                        },
+                        total: { type: 'integer' },
+                        page: { type: 'integer' },
+                        limit: { type: 'integer' }
+                    }
+                },
             },
         },
         servers: [{ url: 'http://localhost:3000/api/v1' }],

@@ -11,9 +11,26 @@ const { verifyToken, authorize } = require('../middlewares/authMiddleware');
  *     tags: [Clientes]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Elementos por página
  *     responses:
  *       200:
  *         description: Listado de clientes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginated'
  *       403:
  *         description: Permiso insuficiente
  */
@@ -209,9 +226,25 @@ router.patch('/entrenadores/:id_entrenador', verifyToken, authorize([1]), client
  *         required: true
  *         schema:
  *           type: integer
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Elementos por página
  *     responses:
  *       200:
  *         description: Historial de evaluaciones
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginated'
  */
 router.get('/:id_cliente/evaluaciones', verifyToken, authorize([1,2]), clienteController.getEvaluaciones);
 
@@ -229,9 +262,25 @@ router.get('/:id_cliente/evaluaciones', verifyToken, authorize([1,2]), clienteCo
  *         required: true
  *         schema:
  *           type: integer
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Elementos por página
  *     responses:
  *       200:
  *         description: Membresías listadas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginated'
  */
 router.get('/:id_cliente/membresias', verifyToken, authorize([1,2,3]), clienteController.getMembresias);
 

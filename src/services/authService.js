@@ -15,6 +15,14 @@ const login = async (email, password) => {
         };
     }
 
+    // 2b. El usuario debe estar activo en la base de datos
+    if (!user.activo) {
+        throw {
+            status: 401,
+            mensaje: "Credenciales inválidas o usuario inactivo"
+        };
+    }
+
     // 3. Verificamos la contraseña usando bcrypt (Requerimiento 3.2 de seguridad)
     // Usamos 'user.password_hash' porque es el nombre que viene de la DB [4, 5]
     const isMatch = await bcrypt.compare(password, user.password_hash);

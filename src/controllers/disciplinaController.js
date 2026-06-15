@@ -1,10 +1,12 @@
 const disciplinaRepository = require('../repositories/disciplinaRepository');
+const { getPaginationParams, paginate } = require('../utils/pagination');
 
 const getDisciplinas = async (req, res) => {
     try {
+        const { page, limit } = getPaginationParams(req.query);
         const disciplinas = await disciplinaRepository.findAll();
         // Respondemos con 200 OK según el estándar [5]
-        res.status(200).json(disciplinas);
+        res.status(200).json(paginate(disciplinas, page, limit));
     } catch (error) {
         res.status(500).json({ 
             error: "Internal Server Error", 

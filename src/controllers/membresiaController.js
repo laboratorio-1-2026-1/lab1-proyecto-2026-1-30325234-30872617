@@ -1,15 +1,49 @@
 const membresiaRepository = require('../repositories/membresiaRepository');
 const clienteRepository = require('../repositories/clienteRepository');
+const { getPaginationParams, paginate } = require('../utils/pagination');
 
 const getSuscripciones = async (req, res) => {
     try {
+        const { page, limit } = getPaginationParams(req.query);
         const suscripciones = await membresiaRepository.listSuscripciones();
-        return res.status(200).json(suscripciones);
+        return res.status(200).json(paginate(suscripciones, page, limit));
     } catch (error) {
         console.error('Error en membresiaController.getSuscripciones:', error.message);
         return res.status(500).json({
             error: 'Internal Server Error',
             mensaje: 'Error al obtener las suscripciones',
+            timestamp: new Date().toISOString()
+        });
+    }
+};
+
+const createSuscripcion = async (req, res) => {
+    try {
+        const { nombre, costo, duracion } = req.body;
+
+        if (!nombre || costo == null || duracion == null) {
+            return res.status(400).json({
+                error: 'Bad Request',
+                mensaje: 'Se requieren nombre, costo y duracion para crear la suscripción',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        if (costo < 0 || duracion <= 0) {
+            return res.status(400).json({
+                error: 'Bad Request',
+                mensaje: 'El costo debe ser mayor o igual a cero y la duración debe ser mayor a cero',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        const suscripcion = await membresiaRepository.createSuscripcion(nombre, costo, duracion);
+        return res.status(201).json(suscripcion);
+    } catch (error) {
+        console.error('Error en membresiaController.createSuscripcion:', error.message);
+        return res.status(500).json({
+            error: 'Internal Server Error',
+            mensaje: 'Error al crear la suscripción',
             timestamp: new Date().toISOString()
         });
     }
@@ -134,8 +168,9 @@ const deactivateExpired = async (req, res) => {
 
 const listClientsNoActive = async (req, res) => {
     try {
+        const { page, limit } = getPaginationParams(req.query);
         const clients = await membresiaRepository.listClientsWithoutActiveMembership();
-        return res.status(200).json(clients);
+        return res.status(200).json(paginate(clients, page, limit));
     } catch (error) {
         console.error('Error en membresiaController.listClientsNoActive:', error.message);
         return res.status(500).json({
@@ -148,6 +183,7 @@ const listClientsNoActive = async (req, res) => {
 
 module.exports = {
     getSuscripciones,
+    createSuscripcion,
     createPago,
     getPagoById,
     getMembresiasByCliente,

@@ -11,6 +11,31 @@ const listSuscripciones = async () => {
     }
 };
 
+const findSuscripcionById = async (id_suscripcion) => {
+    try {
+        const query = 'SELECT id_suscripcion, nombre, costo, duracion FROM suscripcion WHERE id_suscripcion = $1';
+        const result = await pool.query(query, [id_suscripcion]);
+        return result.rows[0] || null;
+    } catch (error) {
+        console.error('Error en membresiaRepository.findSuscripcionById:', error.message);
+        throw error;
+    }
+};
+
+const createSuscripcion = async (nombre, costo, duracion) => {
+    try {
+        const query = `
+            INSERT INTO suscripcion (nombre, costo, duracion)
+            VALUES ($1, $2, $3)
+            RETURNING *`;
+        const result = await pool.query(query, [nombre, costo, duracion]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error en membresiaRepository.createSuscripcion:', error.message);
+        throw error;
+    }
+};
+
 const findMembresiaById = async (id_membresia) => {
     try {
         const query = 'SELECT id_mebresia, id_client, id_suscripcion, fecha_inicio, fecha_fin, estado FROM membresias WHERE id_mebresia = $1';

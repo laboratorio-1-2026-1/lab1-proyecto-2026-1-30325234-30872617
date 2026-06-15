@@ -9,9 +9,26 @@ const { verifyToken, authorize } = require('../middlewares/authMiddleware');
  *   get:
  *     summary: Obtener catálogo de productos
  *     tags: [Tienda]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Elementos por página
  *     responses:
  *       200:
  *         description: Catálogo de productos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginated'
  */
 router.get('/productos', tiendaController.getProductos);
 
@@ -83,7 +100,7 @@ router.patch('/productos/:id_producto/stock', verifyToken, authorize([1]), tiend
  * @swagger
  * /ventas:
  *   post:
- *     summary: Registrar venta (Cliente o Admin)
+ *     summary: Registrar venta (Solo Admin)
  *     tags: [Tienda]
  *     security:
  *       - bearerAuth: []
@@ -93,7 +110,7 @@ router.patch('/productos/:id_producto/stock', verifyToken, authorize([1]), tiend
  *         application/json:
  *           schema:
  *             type: object
- *             required: ['items']
+ *             required: ['id_client', 'items']
  *             properties:
  *               id_client:
  *                 type: integer
@@ -111,7 +128,7 @@ router.patch('/productos/:id_producto/stock', verifyToken, authorize([1]), tiend
  *       201:
  *         description: Venta registrada
  */
-router.post('/ventas', verifyToken, authorize([1,3]), tiendaController.createVenta);
+router.post('/ventas', verifyToken, authorize([1]), tiendaController.createVenta);
 
 /**
  * @swagger
@@ -121,9 +138,26 @@ router.post('/ventas', verifyToken, authorize([1,3]), tiendaController.createVen
  *     tags: [Tienda]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Elementos por página
  *     responses:
  *       200:
  *         description: Historial de ventas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginated'
  */
 router.get('/ventas', verifyToken, authorize([1]), tiendaController.getVentas);
 

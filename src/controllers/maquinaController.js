@@ -1,10 +1,12 @@
 const pool = require('../config/db');
 const mantenimientoRepository = require('../repositories/mantenimientoRepository');
+const { getPaginationParams, paginate } = require('../utils/pagination');
 
 const getMaquinas = async (req, res) => {
     try {
+        const { page, limit } = getPaginationParams(req.query);
         const result = await pool.query('SELECT * FROM maquinas ORDER BY id_maquina');
-        res.status(200).json(result.rows);
+        res.status(200).json(paginate(result.rows, page, limit));
     } catch (error) {
         console.error('Error en maquinaController.getMaquinas:', error);
         res.status(500).json({
@@ -55,6 +57,7 @@ const createTicket = async (req, res) => {
 const getTicketsByMaquina = async (req, res) => {
     try {
         const { id_maquina } = req.params;
+        const { page, limit } = getPaginationParams(req.query);
         const maquina = await mantenimientoRepository.findMaquinaById(id_maquina);
         if (!maquina) {
             return res.status(404).json({
@@ -66,7 +69,7 @@ const getTicketsByMaquina = async (req, res) => {
         }
 
         const tickets = await mantenimientoRepository.getTicketsByMaquina(id_maquina);
-        return res.status(200).json(tickets);
+        return res.status(200).json(paginate(tickets, page, limit));
     } catch (error) {
         console.error('Error en maquinaController.getTicketsByMaquina:', error.message);
         return res.status(500).json({

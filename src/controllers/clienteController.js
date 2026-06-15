@@ -2,11 +2,13 @@ const bcrypt = require('bcryptjs');
 const clienteRepository = require('../repositories/clienteRepository');
 const membresiaRepository = require('../repositories/membresiaRepository');
 const userRepository = require('../repositories/userRepository');
+const { getPaginationParams, paginate } = require('../utils/pagination');
 
 const getClientes = async (req, res) => {
     try {
+        const { page, limit } = getPaginationParams(req.query);
         const clientes = await clienteRepository.listClientes();
-        return res.status(200).json(clientes);
+        return res.status(200).json(paginate(clientes, page, limit));
     } catch (error) {
         console.error('Error en clienteController.getClientes:', error.message);
         return res.status(500).json({
@@ -173,6 +175,7 @@ const createEvaluacion = async (req, res) => {
 
 const getEvaluaciones = async (req, res) => {
     try {
+        const { page, limit } = getPaginationParams(req.query);
         const { id_cliente } = req.params;
         const cliente = await clienteRepository.findClientById(id_cliente);
         if (!cliente) {
@@ -185,7 +188,7 @@ const getEvaluaciones = async (req, res) => {
         }
 
         const evaluaciones = await clienteRepository.findEvaluacionesByClient(id_cliente);
-        return res.status(200).json(evaluaciones);
+        return res.status(200).json(paginate(evaluaciones, page, limit));
     } catch (error) {
         console.error('Error en clienteController.getEvaluaciones:', error.message);
         return res.status(500).json({
@@ -198,6 +201,7 @@ const getEvaluaciones = async (req, res) => {
 
 const getMembresias = async (req, res) => {
     try {
+        const { page, limit } = getPaginationParams(req.query);
         const { id_cliente } = req.params;
         const cliente = await clienteRepository.findClientById(id_cliente);
         if (!cliente) {
@@ -219,7 +223,7 @@ const getMembresias = async (req, res) => {
         }
 
         const membresias = await membresiaRepository.listMembresiasByClient(id_cliente);
-        return res.status(200).json(membresias);
+        return res.status(200).json(paginate(membresias, page, limit));
     } catch (error) {
         console.error('Error en clienteController.getMembresias:', error.message);
         return res.status(500).json({
@@ -249,6 +253,16 @@ const createMembresia = async (req, res) => {
                 error: 'Not Found',
                 codigoInterno: 'ERR_CLIENTE_NO_ENCONTRADO',
                 mensaje: 'No se encontró el cliente especificado',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        const suscripcion = await membresiaRepository.findSuscripcionById(id_suscripcion);
+        if (!suscripcion) {
+            return res.status(404).json({
+                error: 'Not Found',
+                codigoInterno: 'ERR_SUSCRIPCION_NO_ENCONTRADA',
+                mensaje: 'No se encontró la suscripción especificada',
                 timestamp: new Date().toISOString()
             });
         }

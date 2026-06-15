@@ -1,6 +1,7 @@
 const sesionRepository = require('../repositories/sesionRepository');
 const clienteRepository = require('../repositories/clienteRepository');
 const membresiaRepository = require('../repositories/membresiaRepository');
+const { getPaginationParams, paginate } = require('../utils/pagination');
 
 const createSesion = async (req, res) => {
     try {
@@ -104,6 +105,7 @@ const deleteSesion = async (req, res) => {
 const getSesiones = async (req, res) => {
     try {
         const { fecha, disciplina } = req.query;
+        const { page, limit } = getPaginationParams(req.query);
         let sesiones;
         
         if (fecha || disciplina) {
@@ -111,7 +113,7 @@ const getSesiones = async (req, res) => {
         } else {
             sesiones = await sesionRepository.listSesiones();
         }
-        return res.status(200).json(sesiones);
+        return res.status(200).json(paginate(sesiones, page, limit));
     } catch (error) {
         console.error('Error en sesionController.getSesiones:', error.message);
         return res.status(500).json({
@@ -125,6 +127,7 @@ const getSesiones = async (req, res) => {
 const getSesionesReservas = async (req, res) => {
     try {
         const { id_sesion } = req.params;
+        const { page, limit } = getPaginationParams(req.query);
         const sesion = await sesionRepository.findSesionById(id_sesion);
 
         if (!sesion) {
@@ -137,7 +140,7 @@ const getSesionesReservas = async (req, res) => {
         }
 
         const reservas = await sesionRepository.getSessionReservations(id_sesion);
-        return res.status(200).json(reservas);
+        return res.status(200).json(paginate(reservas, page, limit));
     } catch (error) {
         console.error('Error en sesionController.getSesionesReservas:', error.message);
         return res.status(500).json({
@@ -148,96 +151,9 @@ const getSesionesReservas = async (req, res) => {
     }
 };
 
-const createSesionReserva = async (req, res) => {
-    try {
-        const { id_sesion } = req.params;
-        const { id_client, fecha } = req.body;
-
-        if (!id_client) {
-            return res.status(400).json({
-                error: 'Bad Request',
-                mensaje: 'Se requiere el id_client para la reserva administrativa',
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        const cliente = await clienteRepository.findClientById(id_client);
-        if (!cliente) {
-            return res.status(404).json({
-                error: 'Not Found',
-                codigoInterno: 'ERR_CLIENTE_NO_ENCONTRADO',
-                mensaje: 'No se encontró el cliente especificado',
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        const sesion = await sesionRepository.findSesionById(id_sesion);
-        if (!sesion) {
-            return res.status(404).json({
-                error: 'Not Found',
-                codigoInterno: 'ERR_SESION_NO_ENCONTRADA',
-                mensaje: 'No se encontró la sesión especificada',
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        const membresia = await membresiaRepository.findActiveMembershipWithPayment(id_client);
-        if (!membresia || Number(membresia.pagos_count) <= 0) {
-            return res.status(409).json({
-                error: 'Conflict',
-                codigoInterno: 'ERR_MEMBRESIA_INACTIVA',
-                mensaje: 'El cliente no tiene membresía activa con pagos vigentes',
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        const reservaFecha = fecha || new Date().toISOString().split('T')[0];
-        const reservaExistente = await sesionRepository.findReservaByClientSessionDate(id_client, id_sesion, reservaFecha);
-        if (reservaExistente) {
-            return res.status(409).json({
-                error: 'Conflict',
-                codigoInterno: 'ERR_RESERVA_DUPLICADA',
-                mensaje: 'El cliente ya tiene una reserva para esta sesión en la misma fecha',
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        const solapamiento = await sesionRepository.findClientReservationOverlap(id_client, reservaFecha, sesion.hora_inicio, sesion.hora_fin);
-        if (solapamiento) {
-            return res.status(409).json({
-                error: 'Conflict',
-                codigoInterno: 'ERR_SOLAPAMIENTO_RESERVA',
-                mensaje: 'El cliente tiene otra reserva solapada en la misma fecha',
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        const totalReservas = await sesionRepository.countReservasBySessionDate(id_sesion, reservaFecha);
-        if (totalReservas >= sesion.cupos) {
-            return res.status(409).json({
-                error: 'Conflict',
-                codigoInterno: 'ERR_CUPOS_COMPLETOS',
-                mensaje: 'No hay cupos disponibles para esta sesión',
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        const reservaCreada = await sesionRepository.createReserva(id_client, id_sesion, reservaFecha);
-        return res.status(201).json(reservaCreada);
-    } catch (error) {
-        console.error('Error en sesionController.createSesionReserva:', error.message);
-        return res.status(500).json({
-            error: 'Internal Server Error',
-            mensaje: 'Error al crear la reserva de la sesión',
-            timestamp: new Date().toISOString()
-        });
-    }
-};
-
 module.exports = {
     createSesion,
     getSesiones,
     getSesionesReservas,
-    createSesionReserva,
     deleteSesion
 };

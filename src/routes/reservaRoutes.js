@@ -29,6 +29,7 @@ const { verifyToken, authorize } = require('../middlewares/authMiddleware');
  */
 router.post('/', verifyToken, authorize([1,3]), reservaController.createReserva);
 
+
 /**
  * @swagger
  * /reservas/{id_reserva}:

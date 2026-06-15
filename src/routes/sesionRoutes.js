@@ -55,9 +55,25 @@ router.post('/', verifyToken, authorize([1]), sesionController.createSesion);
  *         schema:
  *           type: string
  *         description: Filtrar sesiones por nombre de disciplina
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Elementos por página
  *     responses:
  *       200:
  *         description: Lista de sesiones
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginated'
  */
 router.get('/', verifyToken, authorize([1,2]), sesionController.getSesiones);
 
@@ -75,9 +91,25 @@ router.get('/', verifyToken, authorize([1,2]), sesionController.getSesiones);
  *         required: true
  *         schema:
  *           type: integer
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Página (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Elementos por página
  *     responses:
  *       200:
  *         description: Reservas listadas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginated'
  */
 router.get('/:id_sesion/reservas', verifyToken, authorize([1,2]), sesionController.getSesionesReservas);
 
@@ -103,37 +135,5 @@ router.get('/:id_sesion/reservas', verifyToken, authorize([1,2]), sesionControll
  */
 router.delete('/:id_sesion', verifyToken, authorize([1]), sesionController.deleteSesion);
 
-/**
- * @swagger
- * /sesiones/{id_sesion}/reservas:
- *   post:
- *     summary: Crear reserva administrativa para una sesión (Solo Admin)
- *     tags: [Sesiones]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id_sesion
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: ['id_client']
- *             properties:
- *               id_client:
- *                 type: integer
- *               fecha:
- *                 type: string
- *                 format: date
- *     responses:
- *       201:
- *         description: Reserva creada
- */
-router.post('/:id_sesion/reservas', verifyToken, authorize([1]), sesionController.createSesionReserva);
 
 module.exports = router;

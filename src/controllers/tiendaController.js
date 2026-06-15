@@ -1,11 +1,13 @@
 const pool = require('../config/db');
 const tiendaRepository = require('../repositories/tiendaRepository');
 const clienteRepository = require('../repositories/clienteRepository');
+const { getPaginationParams, paginate } = require('../utils/pagination');
 
 const getProductos = async (req, res) => {
     try {
+        const { page, limit } = getPaginationParams(req.query);
         const productos = await tiendaRepository.listProductos();
-        return res.status(200).json(productos);
+        return res.status(200).json(paginate(productos, page, limit));
     } catch (error) {
         console.error('Error en tiendaController.getProductos:', error.message);
         return res.status(500).json({
@@ -97,43 +99,31 @@ const createVenta = async (req, res) => {
         const { id_client, items } = req.body;
         let clienteId = null;
 
+        if (!id_client) {
+            return res.status(400).json({
+                error: 'Bad Request',
+                mensaje: 'Se requiere id_client para registrar la venta',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        const cliente = await clienteRepository.findClientById(id_client);
+        if (!cliente) {
+            return res.status(404).json({
+                error: 'Not Found',
+                codigoInterno: 'ERR_CLIENTE_NO_ENCONTRADO',
+                mensaje: 'No se encontró el cliente especificado',
+                timestamp: new Date().toISOString()
+            });
+        }
+        clienteId = cliente.id_client;
+
         if (!Array.isArray(items) || items.length === 0) {
             return res.status(400).json({
                 error: 'Bad Request',
                 mensaje: 'Se requieren productos para registrar la venta',
                 timestamp: new Date().toISOString()
             });
-        }
-
-        if (req.user.role === 3) {
-            const cliente = await clienteRepository.findClientByUserId(req.user.id);
-            if (!cliente) {
-                return res.status(404).json({
-                    error: 'Not Found',
-                    codigoInterno: 'ERR_CLIENTE_NO_ENCONTRADO',
-                    mensaje: 'No se encontró el cliente asociado al token',
-                    timestamp: new Date().toISOString()
-                });
-            }
-            clienteId = cliente.id_client;
-        } else {
-            if (!id_client) {
-                return res.status(400).json({
-                    error: 'Bad Request',
-                    mensaje: 'Se requiere id_client para registrar la venta',
-                    timestamp: new Date().toISOString()
-                });
-            }
-            const cliente = await clienteRepository.findClientById(id_client);
-            if (!cliente) {
-                return res.status(404).json({
-                    error: 'Not Found',
-                    codigoInterno: 'ERR_CLIENTE_NO_ENCONTRADO',
-                    mensaje: 'No se encontró el cliente especificado',
-                    timestamp: new Date().toISOString()
-                });
-            }
-            clienteId = cliente.id_client;
         }
 
         await client.query('BEGIN');
@@ -217,8 +207,9 @@ const createVenta = async (req, res) => {
 
 const getVentas = async (req, res) => {
     try {
+        const { page, limit } = getPaginationParams(req.query);
         const ventas = await tiendaRepository.listVentasHistory();
-        return res.status(200).json(ventas);
+        return res.status(200).json(paginate(ventas, page, limit));
     } catch (error) {
         console.error('Error en tiendaController.getVentas:', error.message);
         return res.status(500).json({

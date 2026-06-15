@@ -8,7 +8,8 @@ const bcrypt = require('bcryptjs');
     { email: 'juan.perez@gmail.com', role: 3, pwd: 'Cliente1!' },
     { email: 'maria.lopez@gmail.com', role: 3, pwd: 'Cliente2!' },
     { email: 'pedro.gomez@gmail.com', role: 3, pwd: 'Cliente3!' },
-    { email: 'ana.torres@gmail.com', role: 3, pwd: 'Cliente4!' }
+    { email: 'ana.torres@gmail.com', role: 3, pwd: 'Cliente4!' },
+    { email: 'fernando@gmail.com', role: 3, pwd: '19052003' }
   ];
 
   console.log('INSERT INTO Usuario (password_hash, email, id_rol, activo) VALUES');
