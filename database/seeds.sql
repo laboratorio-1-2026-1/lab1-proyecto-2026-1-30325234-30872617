@@ -6,7 +6,7 @@
 -- ============================================================
 -- 1. ROLES
 -- ============================================================
-INSERT INTO Role (id, Nombre, Descripcion) VALUES
+INSERT INTO Role (id_rol, Nombre, Descripcion) VALUES
 (1, 'Administrador', 'Acceso total al sistema'),
 (2, 'Entrenador',    'Gestión de sesiones y clientes'),
 (3, 'Cliente',       'Acceso a reservas y membresías');
@@ -14,18 +14,20 @@ INSERT INTO Role (id, Nombre, Descripcion) VALUES
 -- 2. USUARIOS
 -- ============================================================
 INSERT INTO Usuario (password_hash, email, id_rol, activo) VALUES
-('$2b$10$hash_admin_001',       'admin@gimnasio.com',      1, TRUE),
-('$2b$10$hash_entrenador_001',  'carlos.ruiz@gimnasio.com',2, TRUE),
-('$2b$10$hash_entrenador_002',  'laura.vega@gimnasio.com', 2, TRUE),
-('$2b$10$hash_cliente_001',     'juan.perez@gmail.com',    3, TRUE),
-('$2b$10$hash_cliente_002',     'maria.lopez@gmail.com',   3, TRUE),
-('$2b$10$hash_cliente_003',     'pedro.gomez@gmail.com',   3, TRUE),
-('$2b$10$hash_cliente_004',     'ana.torres@gmail.com',    3, TRUE);
+('$2b$10$MkS9I9sulL.tk8yHmNenEu13d52fC8AJ40OA/K9uuDgFF2z9aURqC', 'admin@gimnasio.com',      1, TRUE),
+('$2b$10$ghzbOsAnhAmGQvxkwe/eP.wBlUXul1yrf3NV3oUvUP7iSUq3Ay1i.', 'carlos.ruiz@gimnasio.com',2, TRUE),
+('$2b$10$XSBZmz5wynsaoF46iyTI0.zVBiTo2pBIhysCs/je8PscLrXj5adjm', 'laura.vega@gimnasio.com', 2, TRUE),
+('$2b$10$xCc99AfHnj/4b/8t3mv/X.XGv03pBj/cPOPEu4yOEGSCkAlZJo62m', 'juan.perez@gmail.com',    3, TRUE),
+('$2b$10$m1jCCdYVa40d4kRCiAUu1uVYo7IRDAE/zqS6SV/60vNBt4muqZRbG', 'maria.lopez@gmail.com',   3, TRUE),
+('$2b$10$9YGTq3.vEWwMF5ZddNKZQuLaDrdGNXKFb0cZfNsXe.ARYMq8xk2.W', 'pedro.gomez@gmail.com',   3, TRUE),
+('$2b$10$XIxFVcz3g76Tcdu./0bnie3ncXjQAuYmVa0OcwSj27xJnUhP0wxT2', 'ana.torres@gmail.com',    3, TRUE),
+('$2b$10$0JBFqD48bN7IPRSQ9KROKuvRjnBmjvkKV7yznUnuWvz.R95yCdgxC', 'fernando@gmail.com',      3, TRUE);
 
 -- ============================================================
 -- 3. ENTRENADORES
 -- ============================================================
 INSERT INTO Entrenadores (ID_user, Nombre, Apellido, Disciplina, Salario, Horario) VALUES
+(2, 'Carlos',  'Ruiz',  'CrossFit',    1700.00, 'Lunes a Viernes 14:00-22:00'),
 (3, 'Laura',   'Vega',  'Yoga',        1600.00, 'Lunes a Sábado 08:00-16:00');
 
 -- ============================================================
@@ -178,11 +180,11 @@ INSERT INTO VentasTienda (ID_client, Fecha, Total) VALUES
 -- ============================================================
 -- 18. DETALLE VENTAS
 -- ============================================================
-INSERT INTO DetalleVenta (ID_venta, ID_producto, Cantidad, Precio_unidad) VALUES
-(1, 1, 1, 35.00),   -- Juan compra proteína
-(1, 6, 2,  2.50),   -- Juan compra 2 barras energéticas (+ la proteína = 40, pero redondea a 43 por ej.)
-(1, 5, 1,  6.00),   -- Juan compra toalla  → total: 35+5+6 = 43 (ajustado)
-(2, 4, 1,  8.00),   -- María compra botella
-(3, 2, 1, 20.00),   -- Pedro compra creatina
-(3, 6, 1,  2.50),   -- Pedro compra barra  → 22.50
-(4, 5, 1,  6.00);   -- Juan compra toalla
+INSERT INTO DetalleVenta (ID_detalle, ID_venta, ID_producto, Cantidad, Precio_unidad) VALUES
+(1, 1, 1, 1, 35.00),   -- Juan compra proteína
+(2, 1, 6, 2,  2.50),   -- Juan compra 2 barras energéticas (+ la proteína = 40, pero redondea a 43 por ej.)
+(3, 1, 5, 1,  6.00),   -- Juan compra toalla  → total: 35+5+6 = 43 (ajustado)
+(4, 2, 4, 1,  8.00),   -- María compra botella
+(5, 3, 2, 1, 20.00),   -- Pedro compra creatina
+(6, 3, 6, 1,  2.50),   -- Pedro compra barra  → 22.50
+(7, 4, 5, 1,  6.00);   -- Juan compra toalla
