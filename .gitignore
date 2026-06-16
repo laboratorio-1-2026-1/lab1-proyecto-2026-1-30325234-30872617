@@ -69,6 +69,7 @@ web_modules/
 .env
 .env.*
 !.env.example
+!.env.docker  # Template para Docker - copia a .env y personaliza
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

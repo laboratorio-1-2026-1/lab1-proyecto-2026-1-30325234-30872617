@@ -1,35 +1,70 @@
 version: '3.8'
 
 services:
-  # Servicio 1: El motor de base de datos relacional (PostgreSQL)
+  # ---------------------------------------------------------------------------
+  # Base de datos PostgreSQL
+  # ---------------------------------------------------------------------------
   db:
-    image: postgres:15
+    image: postgres:15-alpine
     container_name: smartgym_db
-    restart: always
+    restart: unless-stopped
     environment:
-      # Estos valores deben coincidir con tu .env.example
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-smartgym_db}
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql:ro
+      - ./database/seeds.sql:/docker-entrypoint-initdb.d/2-seeds.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smartgym_network
 
-  # Servicio 2: Tu API de SmartGym (Node.js + Express)
+  # ---------------------------------------------------------------------------
+  # API SmartGym
+  # ---------------------------------------------------------------------------
   app:
     build: .
     container_name: smartgym_api
-    restart: always
+    restart: unless-stopped
     ports:
       - "${PORT:-3000}:${PORT:-3000}"
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh:ro
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
     environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-3000}
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: ${DB_USER:-postgres}
+      PGPASSWORD: ${DB_PASSWORD:-postgres}
+      PGDATABASE: ${DB_NAME:-smartgym_db}
+      PGSSL: "false"
       DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-smartgym_db}
       JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
     depends_on:
-      - db
-    env_file:
-      - .env
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORT:-3000}/api/v1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - smartgym_network
+
+networks:
+  smartgym_network:
+    driver: bridge
 
 volumes:
   postgres_data:
