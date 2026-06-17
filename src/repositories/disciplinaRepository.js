@@ -37,4 +37,18 @@ const deleteDisciplina = async (id_disciplina) => {
     }
 };
 
-module.exports = { findAll, findById, deleteDisciplina };
+const createDisciplina = async (nombre, descripcion) => {
+    try {
+        const query = `
+            INSERT INTO disciplina (nombre, descripcion)
+            VALUES ($1, $2)
+            RETURNING id_disciplina, nombre, descripcion`;
+        const result = await pool.query(query, [nombre, descripcion]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error en disciplinaRepository.createDisciplina:', error.message);
+        throw error;
+    }
+};
+
+module.exports = { findAll, findById, createDisciplina, deleteDisciplina };

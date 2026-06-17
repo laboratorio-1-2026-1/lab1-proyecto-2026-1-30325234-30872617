@@ -35,6 +35,50 @@ const { verifyToken, authorize } = require('../middlewares/authMiddleware');
 router.get('/', verifyToken, authorize([1]), maquinaController.getMaquinas);
 /**
  * @swagger
+ * /maquinas:
+ *   post:
+ *     summary: Crear una nueva máquina (Solo Admin)
+ *     tags: [Máquinas]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/MaquinaInput'
+ *     responses:
+ *       201:
+ *         description: Máquina creada
+ */
+router.post('/', verifyToken, authorize([1]), maquinaController.createMaquina);
+/**
+ * @swagger
+ * /maquinas/{id_maquina}:
+ *   patch:
+ *     summary: Actualizar una máquina existente (Solo Admin)
+ *     tags: [Máquinas]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id_maquina
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/MaquinaInput'
+ *     responses:
+ *       200:
+ *         description: Máquina actualizada
+ */
+router.patch('/:id_maquina', verifyToken, authorize([1]), maquinaController.updateMaquina);
+/**
+ * @swagger
  * /maquinas/{id_maquina}/tickets:
  *   post:
  *     summary: Crear ticket de mantenimiento para una máquina
@@ -62,6 +106,30 @@ router.get('/', verifyToken, authorize([1]), maquinaController.getMaquinas);
  *         description: Ticket creado
  */
 router.post('/:id_maquina/tickets', verifyToken, authorize([1]), maquinaController.createTicket);
+
+/**
+ * @swagger
+ * /maquinas/categorias:
+ *   post:
+ *     summary: Crear categoría de máquina (Solo Admin)
+ *     tags: [Máquinas]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: ['nombre']
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Categoría de máquina creada
+ */
+router.post('/categorias', verifyToken, authorize([1]), maquinaController.createCategoriaMaquina);
 
 /**
  * @swagger
@@ -100,34 +168,5 @@ router.post('/:id_maquina/tickets', verifyToken, authorize([1]), maquinaControll
  *         description: Máquina no encontrada
  */
 router.get('/:id_maquina/tickets', verifyToken, authorize([1]), maquinaController.getTicketsByMaquina);
-
-/**
- * @swagger
- * /maquinas/{id_maquina}/estado:
- *   patch:
- *     summary: Actualizar estado de una máquina
- *     tags: [Máquinas]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id_maquina
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               estado:
- *                 type: string
- *     responses:
- *       200:
- *         description: Estado actualizado
- */
-router.patch('/:id_maquina/estado', verifyToken, authorize([1]), maquinaController.updateEstado);
 
 module.exports = router;

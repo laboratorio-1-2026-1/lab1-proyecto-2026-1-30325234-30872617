@@ -11,6 +11,62 @@ const findMaquinaById = async (id_maquina) => {
     }
 };
 
+const findCategoriaById = async (id_categoria) => {
+    try {
+        const query = 'SELECT id_categoria, nombre FROM categoriamaquinas WHERE id_categoria = $1';
+        const result = await pool.query(query, [id_categoria]);
+        return result.rows[0] || null;
+    } catch (error) {
+        console.error('Error en mantenimientoRepository.findCategoriaById:', error.message);
+        throw error;
+    }
+};
+
+const createCategoriaMaquina = async (nombre) => {
+    try {
+        const query = `
+            INSERT INTO categoriamaquinas (nombre)
+            VALUES ($1)
+            RETURNING id_categoria, nombre`;
+        const result = await pool.query(query, [nombre]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error en mantenimientoRepository.createCategoriaMaquina:', error.message);
+        throw error;
+    }
+};
+
+const createMaquina = async ({ id_categoria, nombre, descripcion }) => {
+    try {
+        const query = `
+            INSERT INTO maquinas (id_categoria, nombre, descripcion, estado)
+            VALUES ($1, $2, $3, 'Operativa')
+            RETURNING id_maquina, id_categoria, nombre, descripcion, estado`;
+        const result = await pool.query(query, [id_categoria, nombre, descripcion]);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error en mantenimientoRepository.createMaquina:', error.message);
+        throw error;
+    }
+};
+
+const updateMaquina = async (id_maquina, { id_categoria, nombre, descripcion }) => {
+    try {
+        const query = `
+            UPDATE maquinas
+            SET id_categoria = COALESCE($2, id_categoria),
+                nombre = COALESCE($3, nombre),
+                descripcion = COALESCE($4, descripcion)
+            WHERE id_maquina = $1
+            RETURNING id_maquina, id_categoria, nombre, descripcion, estado`;
+        const result = await pool.query(query, [id_maquina, id_categoria, nombre, descripcion]);
+        return result.rows[0] || null;
+    } catch (error) {
+        console.error('Error en mantenimientoRepository.updateMaquina:', error.message);
+        throw error;
+    }
+};
+
 const createTicket = async (id_maquina, descripcion) => {
     try {
         const query = `
@@ -89,6 +145,10 @@ const getTicketsByMaquina = async (id_maquina) => {
 
 module.exports = {
     findMaquinaById,
+    findCategoriaById,
+    createCategoriaMaquina,
+    createMaquina,
+    updateMaquina,
     createTicket,
     updateMachineEstado,
     listTicketsHistory,

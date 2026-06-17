@@ -16,6 +16,30 @@ const getDisciplinas = async (req, res) => {
     }
 };
 
+const createDisciplina = async (req, res) => {
+    try {
+        const { nombre, descripcion } = req.body;
+
+        if (!nombre) {
+            return res.status(400).json({
+                error: 'Bad Request',
+                mensaje: 'Se requiere nombre para crear la disciplina',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        const disciplina = await disciplinaRepository.createDisciplina(nombre, descripcion || null);
+        return res.status(201).json(disciplina);
+    } catch (error) {
+        console.error('Error en disciplinaController.createDisciplina:', error.message);
+        return res.status(500).json({
+            error: 'Internal Server Error',
+            mensaje: 'Error al crear la disciplina',
+            timestamp: new Date().toISOString()
+        });
+    }
+};
+
 const deleteDisciplina = async (req, res) => {
     try {
         const { id_disciplina } = req.params;
@@ -45,4 +69,4 @@ const deleteDisciplina = async (req, res) => {
     }
 };
 
-module.exports = { getDisciplinas, deleteDisciplina };
+module.exports = { getDisciplinas, createDisciplina, deleteDisciplina };

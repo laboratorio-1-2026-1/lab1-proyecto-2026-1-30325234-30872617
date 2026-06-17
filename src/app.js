@@ -45,6 +45,14 @@ const swaggerOptions = {
                         limit: { type: 'integer' }
                     }
                 },
+                MaquinaInput: {
+                    type: 'object',
+                    properties: {
+                        id_categoria: { type: 'integer' },
+                        nombre: { type: 'string' },
+                        descripcion: { type: 'string' }
+                    }
+                }
             },
         },
         servers: [{ url: 'http://localhost:3000/api/v1' }],

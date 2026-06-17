@@ -38,4 +38,50 @@ const { verifyToken, authorize } = require('../middlewares/authMiddleware');
 // Protegido: Admin, Entrenador o Cliente pueden consultar
 router.get('/', verifyToken, authorize([1, 2, 3]), disciplinaController.getDisciplinas);
 
+/**
+ * @swagger
+ * /disciplinas:
+ *   post:
+ *     summary: Crear una nueva disciplina (Solo Admin)
+ *     tags: [Disciplinas]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: ['nombre']
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               descripcion:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Disciplina creada
+ */
+router.post('/', verifyToken, authorize([1]), disciplinaController.createDisciplina);
+
+/**
+ * @swagger
+ * /disciplinas/{id_disciplina}:
+ *   delete:
+ *     summary: Eliminar una disciplina (Solo Admin)
+ *     tags: [Disciplinas]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id_disciplina
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Disciplina eliminada
+ */
+router.delete('/:id_disciplina', verifyToken, authorize([1]), disciplinaController.deleteDisciplina);
+
 module.exports = router;
